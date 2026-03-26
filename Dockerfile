@@ -11,6 +11,7 @@ WORKDIR /app
 COPY molly.conf /app/molly.conf
 COPY cert.pem /app/cert.pem
 COPY key.pem /app/key.pem
+RUN chmod 600 /app/key.pem
 COPY content/ /app/content/
 
 EXPOSE 1965
