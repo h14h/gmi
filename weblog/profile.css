@@ -79,8 +79,12 @@ a, a:link {
 }
 
 .ascii-art {
+  font-family: "Courier New", Courier, monospace;
   font-size: 15px;
-  line-height: 1.4;
+  line-height: 1;
+  letter-spacing: 0;
+  font-kerning: none;
+  font-variant-ligatures: none;
   margin: 0;
   flex-shrink: 0;
 }
