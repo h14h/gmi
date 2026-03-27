@@ -13,6 +13,22 @@ Push to `main` deploys everything via GitHub Actions:
 - Blog posts → omg.lol (converted from gemtext to markdown)
 - Weblog config/templates → omg.lol
 
+## Secrets
+
+The Gemini TLS private key is injected by Fly at runtime from a Fly secret, not copied into the image.
+
+Set the Fly secret once using a base64-encoded PEM:
+
+```sh
+fly secrets set TLS_KEY_PEM_B64="$(base64 < key.pem | tr -d '\n')"
+```
+
+GitHub Actions still needs:
+- `FLY_API_TOKEN`
+- `OMGLOL_API_KEY`
+
+After migrating to Fly-managed runtime secrets, remove `TLS_KEY_PEM_B64` from GitHub Actions secrets.
+
 ## Local development
 
 Write `.gmi` files in `content/`, then:

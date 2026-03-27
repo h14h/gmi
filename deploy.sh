@@ -34,6 +34,8 @@ if [[ -z "${OMGLOL_API_KEY:-}" ]]; then
     exit 1
 fi
 
+publish_failed=0
+
 for file in "$CONTENT_DIR"/[0-9]*.gmi; do
     [[ -f "$file" ]] || continue
     filename=$(basename "$file" .gmi)
@@ -46,7 +48,7 @@ for file in "$CONTENT_DIR"/[0-9]*.gmi; do
 
     md_content=$(gmi_to_md "$file")
 
-    response=$(curl -s -w "\n%{http_code}" -X POST \
+    if curl --fail-with-body -sS -X POST \
         -H "Authorization: Bearer ${OMGLOL_API_KEY}" \
         -H "Content-Type: text/plain" \
         -d "---
@@ -55,15 +57,19 @@ Slug: ${slug}
 ---
 
 ${md_content}" \
-        "${OMGLOL_API}/${slug}")
-
-    http_code=$(echo "$response" | tail -1)
-    if [[ "$http_code" =~ ^2 ]]; then
-        echo "  OK ($http_code)"
+        "${OMGLOL_API}/${slug}" >/dev/null; then
+        echo "  OK"
     else
-        echo "  FAILED ($http_code): $(echo "$response" | sed '$d')"
+        echo "  FAILED"
+        publish_failed=1
     fi
 done
+
+if (( publish_failed )); then
+    echo ""
+    echo "==> Publish completed with errors"
+    exit 1
+fi
 
 echo ""
 echo "==> Done"
